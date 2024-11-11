@@ -4,22 +4,24 @@
 #include <string.h>
 #include "bataille_navale.h"
 
-// Fonction pour initialiser la grille du joueur
-void initialiser_grille(Grille *grille) {
+// Fonction pour initialiser la grille d'un joueur
+void initialiserGrille(Grille *grille) {
+    // Remplir toute la grille avec des '~' (eau)
     for (int i = 0; i < TAILLE_GRILLE; i++) {
         for (int j = 0; j < TAILLE_GRILLE; j++) {
             grille->grille[i][j] = '~'; // Indicateur d'eau
         }
     }
-    initialiser_bateaux(grille);
+    initialiserBateaux(grille);
 }
 
-// Fonction pour initialiser les bateaux sur la grille
-void initialiser_bateaux(Grille *grille) {
-    // Exemple de bateaux (à personnaliser selon les règles)
+// Fonction pour initialiser les bateaux du joueur
+void initialiserBateaux(Grille *grille) {
+    // Exemple de bateaux (à personnaliser)
     strcpy(grille->bateaux[0].nom, "Destroyer");
     grille->bateaux[0].taille = 3;
     grille->bateaux[1].taille = 4;
+    
     // Placer les bateaux sur la grille (logique simplifiée)
     for (int i = 0; i < 3; i++) {
         grille->grille[1][i] = 'D'; // Bateau Destroyer
@@ -30,7 +32,7 @@ void initialiser_bateaux(Grille *grille) {
 }
 
 // Fonction pour afficher la grille d'un joueur
-void afficher_grille(const Grille *grille) {
+void afficherGrille(const Grille *grille) {
     printf("\nGrille de jeu:\n");
     for (int i = 0; i < TAILLE_GRILLE; i++) {
         for (int j = 0; j < TAILLE_GRILLE; j++) {
@@ -59,8 +61,8 @@ int tirer(Grille *grille, int x, int y) {
     return 0;
 }
 
-// Vérifier si tous les bateaux d'un joueur sont coulés
-int tous_bateaux_coules(const Grille *grille) {
+// Fonction pour vérifier si tous les bateaux d'un joueur sont coulés
+int tousLesBateauxCoules(const Grille *grille) {
     for (int i = 0; i < NB_BATEAUX; i++) {
         for (int j = 0; j < grille->bateaux[i].taille; j++) {
             if (grille->grille[grille->bateaux[i].position_x[j]][grille->bateaux[i].position_y[j]] != 'X') {
@@ -71,10 +73,11 @@ int tous_bateaux_coules(const Grille *grille) {
     return 1; // Tous les bateaux sont coulés
 }
 
-// Fonction gérant les actions d'un joueur dans son thread
-void *fonction_joueur(void *param) {
+// Fonction principale du joueur dans son thread
+void *fonctionJoueur(void *param) {
     Joueur *joueur = (Joueur *)param;
     int x, y;
+    
     while (!joueur->gagnant) {
         printf("Joueur %d, entrez les coordonnées du tir (x y) : ", joueur->joueur_id);
         scanf("%d %d", &x, &y);
@@ -82,11 +85,11 @@ void *fonction_joueur(void *param) {
 
         // Effectuer le tir
         if (tirer(&joueur->grille, x, y)) {
-            afficher_grille(&joueur->grille);
+            afficherGrille(&joueur->grille);
         }
 
         // Vérifier si le joueur a gagné
-        if (tous_bateaux_coules(&joueur->grille)) {
+        if (tousLesBateauxCoules(&joueur->grille)) {
             joueur->gagnant = 1;
             printf("Joueur %d a gagné!\n", joueur->joueur_id);
         }
@@ -106,12 +109,12 @@ int main() {
         joueurs[i].gagnant = 0;
         joueurs[i].joueur_id = i + 1;
         joueurs[i].mutex = mutexes[i];
-        initialiser_grille(&joueurs[i].grille);
+        initialiserGrille(&joueurs[i].grille);
     }
 
     // Création des threads pour les joueurs
     for (int i = 0; i < 2; i++) {
-        pthread_create(&joueurs[i].thread, NULL, fonction_joueur, (void *)&joueurs[i]);
+        pthread_create(&joueurs[i].thread, NULL, fonctionJoueur, (void *)&joueurs[i]);
     }
 
     // Attendre la fin des threads
@@ -126,3 +129,4 @@ int main() {
 
     return 0;
 }
+vcx

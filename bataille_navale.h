@@ -31,11 +31,11 @@ typedef struct {
 } Joueur;
 
 // Déclarations des fonctions
-void *fonction_joueur(void *param);
-void initialiser_grille(Grille *grille);
-void afficher_grille(const Grille *grille);
+void *fonctionJoueur(void *param);
+void initialiserGrille(Grille *grille);
+void afficherGrille(const Grille *grille);
 int tirer(Grille *grille, int x, int y);
-int tous_bateaux_coules(const Grille *grille);
-void initialiser_bateaux(Grille *grille);
+int tousLesBateauxCoules(const Grille *grille);
+void initialiserBateaux(Grille *grille);
 
 #endif
